@@ -66,7 +66,12 @@ public class UiTaskWindowLogic {
         taskWindowController.setControllerFields(taskUiKeeper);
 
         taskWindowStage.setTitle(task.getTaskName());
+        taskWindowStage.setOnCloseRequest(event -> onWindowClose(logic, task));
         taskWindowStage.show();
+    }
+
+    private void onWindowClose(MainLogic logic, Task task) {
+        logic.updateTask(task);
     }
 
     private void initEndDate(Task task) {

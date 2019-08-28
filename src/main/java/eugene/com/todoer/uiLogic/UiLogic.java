@@ -60,13 +60,6 @@ public class UiLogic {
         });
     }
 
-    private TaskUiKeeper createNewTaskKeeper(TaskController taskController, Parent root, int id) {
-        TaskUiKeeper taskUiKeeper = new TaskUiKeeper(id, root, taskController);
-        taskKeeperList.put(id, taskUiKeeper);
-
-        return taskUiKeeper;
-    }
-
     public VBox getVBoxBasedOnGlob(CheckBox checkboxGlob, VBox globBox, VBox dayBox) {
         if (checkboxGlob.isSelected()) {
             return globBox;
@@ -81,5 +74,19 @@ public class UiLogic {
 
     public void setTimerUiUpdate(Storage storage) {
         uiTimer.setUiUpdateTimer(storage, taskKeeperList);
+    }
+
+    public void closeStage(Stage primStage) {
+        Platform.runLater(() -> {
+            uiTimer.stopTimer();
+            primStage.close();
+        });
+    }
+
+    private TaskUiKeeper createNewTaskKeeper(TaskController taskController, Parent root, int id) {
+        TaskUiKeeper taskUiKeeper = new TaskUiKeeper(id, root, taskController);
+        taskKeeperList.put(id, taskUiKeeper);
+
+        return taskUiKeeper;
     }
 }

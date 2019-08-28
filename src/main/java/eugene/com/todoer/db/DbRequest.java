@@ -82,6 +82,8 @@ public class DbRequest {
         } catch (SQLException e) {
             log.error("Error to update task in db with id: {}. Error: {}", task.getId(), e.getMessage(), e);
         }
+
+        task.getSubTaskList().forEach(this::updateSubTask);
     }
 
     public void addSubTask(SubTask subTask) {
@@ -107,15 +109,16 @@ public class DbRequest {
     }
 
     public void updateSubTask(SubTask subTask) {
-        String sql = "UPDATE subTask SET parentId=?,taskName=?,description=?,isDone=? WHERE id=?";
+        String sql = "UPDATE subTask SET taskName=?,description=?,isDone=? WHERE id=? AND parentId=?";
 
         try {
             pstmt = conn.prepareStatement(sql);
 
-            pstmt.setInt(1, subTask.getParentTaskId());
-            pstmt.setString(2, subTask.getTaskName());
-            pstmt.setString(3, subTask.getDescription());
-            pstmt.setBoolean(4, subTask.isIsDone());
+            pstmt.setString(1, subTask.getTaskName());
+            pstmt.setString(2, subTask.getDescription());
+            pstmt.setBoolean(3, subTask.isIsDone());
+            pstmt.setInt(4, subTask.getId());
+            pstmt.setInt(5, subTask.getParentTaskId());
 
             pstmt.executeUpdate();
 
