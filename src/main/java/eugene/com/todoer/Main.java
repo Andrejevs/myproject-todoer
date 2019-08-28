@@ -40,8 +40,8 @@ public class Main extends Application {
 
         TaskWindowController taskWindowController = new TaskWindowController();
 
-        MainController mainController = new MainController(
-                prepareTaskWindowStage(taskWindowController), taskWindowController);
+        MainController mainController = new MainController(prepareTaskWindowStage(taskWindowController),
+                taskWindowController, primaryStage);
 
         fxmlLoader.setController(mainController);
 

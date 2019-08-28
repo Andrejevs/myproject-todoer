@@ -47,6 +47,8 @@ public class UiTaskPaneLogic {
     private Button initCheckBtn(TaskController taskController, Task task) {
         Button checkBtn = taskController.getBtnCheck();
 
+        getIsDoneStyle(checkBtn, task.isIsDone());
+
         checkBtn.textProperty().bindBidirectional(task.subTaskCounterProperty(), converterToString);
         checkBtn.setOnAction(event -> onCheckBtn(task));
 

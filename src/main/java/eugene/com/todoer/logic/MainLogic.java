@@ -1,7 +1,7 @@
 package eugene.com.todoer.logic;
 
 import eugene.com.todoer.Storage;
-import eugene.com.todoer.UiListenerI;
+import eugene.com.todoer.IUiListener;
 import eugene.com.todoer.data.SubTask;
 import eugene.com.todoer.data.Task;
 import eugene.com.todoer.db.DbRequest;
@@ -11,15 +11,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class MainLogic {
     private static final Logger log = LoggerFactory.getLogger(MainLogic.class);
+    private final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
     private final DbRequest dbReq;
-    private final UiListenerI uiListener;
+    private final IUiListener uiListener;
     private final Storage storage;
     private int taskIdCounter = 0;
 
-    public MainLogic(UiListenerI uiListener) {
+    public MainLogic(IUiListener uiListener) {
         this.storage = new Storage();
         this.uiListener = uiListener;
         this.dbReq = new DbRequest();
@@ -30,10 +33,16 @@ public class MainLogic {
     }
 
     public void closeApp() {
-        dbReq.disconnect();
-        log.debug("App was closed by user");
+        storage.getTasksMap().forEach((id, task) -> updateTask(task));
 
-        System.exit(0);
+        service.execute(() -> {
+            dbReq.disconnect();
+
+            service.shutdown();
+        });
+
+        log.debug("App was closed by user");
+        uiListener.closeStage();
     }
 
     public void addNewTask() {
@@ -43,7 +52,8 @@ public class MainLogic {
 
         uiListener.createTaskUi(task);
 
-        dbReq.addNewTask(task);
+        service.execute(() -> dbReq.addNewTask(task));
+
     }
 
     public void addDbTask(Task task) {
@@ -63,7 +73,7 @@ public class MainLogic {
     }
 
     public void updateTask(Task task) {
-        dbReq.updateTask(task);
+        service.execute(() -> dbReq.updateTask(task));
     }
 
     public void addSubTaskToTask(Task task) {
@@ -71,8 +81,10 @@ public class MainLogic {
 
         task.getSubTaskList().add(subTask);
 
-        dbReq.addSubTask(subTask);
-        dbReq.updateTask(task);
+        service.execute(() -> {
+            dbReq.addSubTask(subTask);
+            dbReq.updateTask(task);
+        });
     }
 
     public void addSubTaskToTaskFromDb(Task task, SubTask subTask) {
@@ -87,7 +99,16 @@ public class MainLogic {
         }
 
         dbReq.getAllSubTasks().forEach(subTask -> {
-            addSubTaskToTaskFromDb(storage.getTasksMap().get(subTask.getParentTaskId()), subTask);
+            Task task = storage.getTasksMap().get(subTask.getParentTaskId());
+
+            if (task == null) {
+                log.error("Found subtask with no task. id: {}, parentId: {}",
+                        subTask.getId(), subTask.getParentTaskId());
+
+                closeApp();
+            }
+
+            addSubTaskToTaskFromDb(task, subTask);
         });
 
     }

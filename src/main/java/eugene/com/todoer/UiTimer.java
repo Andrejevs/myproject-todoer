@@ -12,11 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UiTimer {
     private final int UPDATE_FRAME_RATE = 1000;
-
+    private final Timer timer = new Timer();
 
     public void setUiUpdateTimer(Storage storage, ConcurrentHashMap<Integer, TaskUiKeeper> taskKeeperList) {
-        Timer timer = new Timer();
         timer.schedule(updateTime(storage, taskKeeperList), 0L, UPDATE_FRAME_RATE);
+    }
+
+    public void stopTimer() {
+        timer.cancel();
     }
 
     private TimerTask updateTime(Storage storage, ConcurrentHashMap<Integer, TaskUiKeeper> taskKeeperList) {
@@ -29,7 +32,7 @@ public class UiTimer {
                     taskKeeperList.forEach((id, keeper) -> {
                         Task task = tasksMap.get(id);
 
-                        int day = Period.between(LocalDate.now(), task.getDate()).getDays();
+                        int day = Period.between(task.getDate(), LocalDate.now()).getDays();
                         int endDay = Period.between(LocalDate.now(), task.getEndDate()).getDays();
 
                         if (endDay < 0) {

@@ -1,7 +1,7 @@
 package eugene.com.todoer.controllers;
 
 import eugene.com.todoer.data.Task;
-import eugene.com.todoer.UiListenerI;
+import eugene.com.todoer.IUiListener;
 import eugene.com.todoer.logic.MainLogic;
 import eugene.com.todoer.uiLogic.UiLogic;
 import javafx.fxml.FXML;
@@ -16,16 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
-public class MainController implements UiListenerI {
+public class MainController implements IUiListener {
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
     private static final String TASK_PANE_PATH = "/paneTask.fxml";
     private final MainLogic logic = new MainLogic(this);
     private final UiLogic uiLogic;
+    private final Stage primStage;
 
     @FXML
     private AnchorPane paneMain;
@@ -42,8 +39,9 @@ public class MainController implements UiListenerI {
     @FXML
     private TextField textNewTaskName;
 
-    public MainController(Stage taskWindowStage, TaskWindowController taskWindowController) {
-        uiLogic = new UiLogic(taskWindowStage, taskWindowController);
+    public MainController(Stage taskWindowStage, TaskWindowController taskWindowController, Stage primaryStage) {
+        this.uiLogic = new UiLogic(taskWindowStage, taskWindowController);
+        this.primStage = primaryStage;
     }
 
     @FXML
@@ -73,6 +71,11 @@ public class MainController implements UiListenerI {
     @Override
     public void pressGlobalCheckBox() {
         uiLogic.checkGlobalCheckBox(checkboxGlob);
+    }
+
+    @Override
+    public void closeStage() {
+        uiLogic.closeStage(primStage);
     }
 
     private VBox getVBoxBasedOnGlob() {
