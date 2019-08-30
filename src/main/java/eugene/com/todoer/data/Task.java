@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Task {
+    private final int id;
+    private final int idUser;
     private final LocalDate date;
     private final SimpleStringProperty taskName;
     private SimpleIntegerProperty subTaskCounter = new SimpleIntegerProperty(0);
@@ -21,10 +23,10 @@ public class Task {
     private SimpleBooleanProperty isDone;
     private LocalDate endDate;
     private boolean isDeleted = false;
-    private int id;
+    private boolean isGlobal = false;
     private ObservableList<SubTask> subTaskList;
 
-    public Task(String name, int id) {
+    public Task(String name, int id, boolean isGlobal, int idUser) {
         this.date = LocalDate.now();
         this.taskName = new SimpleStringProperty(name);
         this.id = id;
@@ -32,10 +34,12 @@ public class Task {
         this.isDone = new SimpleBooleanProperty(false);
         this.endDate = LocalDate.now();
         this.endDateLeft = new SimpleIntegerProperty(0);
+        this.isGlobal = isGlobal;
+        this.idUser = idUser;
     }
 
     public Task(int id, int subTaskCounter, boolean isDone, String taskName, LocalDate date, LocalDate endDate,
-                boolean isDeleted) {
+                boolean isDeleted, boolean isGlobal, int idUser) {
         this.id = id;
         this.subTaskCounter.set(subTaskCounter);
         this.isDone = new SimpleBooleanProperty(isDone);
@@ -45,6 +49,8 @@ public class Task {
         this.isDeleted = isDeleted;
         this.subTaskList = FXCollections.observableArrayList();
         this.endDateLeft = new SimpleIntegerProperty(0);
+        this.isGlobal = isGlobal;
+        this.idUser = idUser;
     }
 
     public String getTaskName() {
@@ -127,5 +133,13 @@ public class Task {
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public boolean isGlobal() {
+        return isGlobal;
+    }
+
+    public int getIdUser() {
+        return idUser;
     }
 }

@@ -2,6 +2,7 @@ package eugene.com.todoer;
 
 import eugene.com.todoer.controllers.MainController;
 import eugene.com.todoer.controllers.TaskWindowController;
+import eugene.com.todoer.data.User;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -40,8 +41,10 @@ public class Main extends Application {
 
         TaskWindowController taskWindowController = new TaskWindowController();
 
+        User user = new User("jevgenijs", "123");
+
         MainController mainController = new MainController(prepareTaskWindowStage(taskWindowController),
-                taskWindowController, primaryStage);
+                taskWindowController, primaryStage, user);
 
         fxmlLoader.setController(mainController);
 

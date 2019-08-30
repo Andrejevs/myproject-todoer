@@ -68,7 +68,7 @@ public class UiLogic {
         return dayBox;
     }
 
-    public void checkGlobalCheckBox(CheckBox checkboxGlob) {
+    public void pressGlobalCheckBox(CheckBox checkboxGlob) {
         Platform.runLater(() -> checkboxGlob.setSelected(!checkboxGlob.isSelected()));
     }
 
@@ -83,10 +83,23 @@ public class UiLogic {
         });
     }
 
+    public boolean getGlobalCheckbox(CheckBox checkboxGlob) {
+        //TODO have to be in platform.runlater
+        return checkboxGlob.isSelected();
+    }
+
     private TaskUiKeeper createNewTaskKeeper(TaskController taskController, Parent root, int id) {
         TaskUiKeeper taskUiKeeper = new TaskUiKeeper(id, root, taskController);
         taskKeeperList.put(id, taskUiKeeper);
 
         return taskUiKeeper;
+    }
+
+    public VBox getVboxBasedOnGlobal(Task task, VBox vboxGlobal, VBox vboxLocal) {
+        if (task.isGlobal()) {
+            return vboxGlobal;
+        }
+
+        return vboxLocal;
     }
 }

@@ -2,6 +2,8 @@ package eugene.com.todoer.controllers;
 
 import eugene.com.todoer.data.Task;
 import eugene.com.todoer.IUiListener;
+import eugene.com.todoer.data.User;
+import eugene.com.todoer.db.DbRequest;
 import eugene.com.todoer.logic.MainLogic;
 import eugene.com.todoer.uiLogic.UiLogic;
 import javafx.fxml.FXML;
@@ -20,7 +22,7 @@ import java.io.IOException;
 public class MainController implements IUiListener {
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
     private static final String TASK_PANE_PATH = "/paneTask.fxml";
-    private final MainLogic logic = new MainLogic(this);
+    private final MainLogic logic;
     private final UiLogic uiLogic;
     private final Stage primStage;
 
@@ -39,9 +41,11 @@ public class MainController implements IUiListener {
     @FXML
     private TextField textNewTaskName;
 
-    public MainController(Stage taskWindowStage, TaskWindowController taskWindowController, Stage primaryStage) {
+    public MainController(Stage taskWindowStage, TaskWindowController taskWindowController, Stage primaryStage,
+                          User user) {
         this.uiLogic = new UiLogic(taskWindowStage, taskWindowController);
         this.primStage = primaryStage;
+        logic = new MainLogic(this, user);
     }
 
     @FXML
@@ -60,9 +64,9 @@ public class MainController implements IUiListener {
     }
 
     @Override
-    public void createTaskUi(Task task) {
+    public void createTaskUi(Task task, VBox vbox) {
         try {
-            uiLogic.createTaskUi(TASK_PANE_PATH, task, getVBoxBasedOnGlob(), logic);
+            uiLogic.createTaskUi(TASK_PANE_PATH, task, vbox, logic);
         } catch (IOException e) {
             log.error("Error to create task UI keeper. Error: {}", e.getMessage(), e);
         }
@@ -70,12 +74,22 @@ public class MainController implements IUiListener {
 
     @Override
     public void pressGlobalCheckBox() {
-        uiLogic.checkGlobalCheckBox(checkboxGlob);
+        uiLogic.pressGlobalCheckBox(checkboxGlob);
     }
 
     @Override
     public void closeStage() {
         uiLogic.closeStage(primStage);
+    }
+
+    @Override
+    public boolean isGlobal() {
+        return uiLogic.getGlobalCheckbox(checkboxGlob);
+    }
+
+    @Override
+    public VBox getVboxBasedOnGlobal(Task task) {
+        return uiLogic.getVboxBasedOnGlobal(task, vboxGlobal, vboxLocal);
     }
 
     private VBox getVBoxBasedOnGlob() {
